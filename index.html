@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Marketplace - Arc Testnet</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 0;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #60a5fa, #a78bfa);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle {
+            color: #94a3b8;
+            font-size: 1.1em;
+            margin-bottom: 20px;
+        }
+
+        .wallet-section {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .wallet-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .wallet-info span {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .address {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #64748b;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .card h2 {
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            color: #60a5fa;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-weight: 600;
+            font-size: 0.95em;
+            color: #cbd5e1;
+        }
+
+        input, textarea {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 6px;
+            padding: 12px;
+            color: #e2e8f0;
+            font-size: 1em;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .products-section {
+            grid-column: 1 / -1;
+        }
+
+        .products-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .product-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 10px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover {
+            border-color: #3b82f6;
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.1);
+        }
+
+        .product-card h3 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            word-break: break-word;
+        }
+
+        .product-card p {
+            color: #94a3b8;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            word-break: break-word;
+        }
+
+        .product-price {
+            font-size: 1.5em;
+            color: #10b981;
+            font-weight: bold;
+            margin: 15px 0;
+        }
+
+        .product-status {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .status-available {
+            background: #10b98115;
+            color: #10b981;
+        }
+
+        .status-sold {
+            background: #ef444415;
+            color: #ef4444;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .product-actions button {
+            flex: 1;
+            padding: 10px;
+            font-size: 0.95em;
+        }
+
+        .transactions-section {
+            grid-column: 1 / -1;
+        }
+
+        .transaction-item {
+            background: #0f172a;
+            border-left: 3px solid #3b82f6;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .transaction-amount {
+            font-size: 1.3em;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        .transaction-time {
+            color: #64748b;
+            font-size: 0.9em;
+        }
+
+        .error-message {
+            background: #ef444420;
+            border: 1px solid #ef4444;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            color: #fca5a5;
+        }
+
+        .success-message {
+            background: #10b98120;
+            border: 1px solid #10b981;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 15px;
+            color: #86efac;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #334155;
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .balance-info {
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .balance-label {
+            color: #94a3b8;
+            font-size: 0.95em;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            font-size: 1.8em;
+            color: #10b981;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .wallet-section {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .products-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .no-products {
+            text-align: center;
+            color: #64748b;
+            padding: 40px 20px;
+            background: #0f172a;
+            border-radius: 10px;
+            border: 1px dashed #334155;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏪 Simple Marketplace</h1>
+            <p class="subtitle">Um marketplace descentralizado na Arc testnet</p>
+        </header>
+
+        <div class="wallet-section" id="walletSection">
+            <div class="wallet-info">
+                <div class="status-dot"></div>
+                <span>
+                    <strong id="connectionStatus">Conectando...</strong>
+                    <span class="address" id="walletAddress">Aguarde...</span>
+                </span>
+            </div>
+            <button id="connectBtn" onclick="connectWallet()">Conectar Carteira</button>
+        </div>
+
+        <div class="main-content">
+            <!-- Seção: Listar Produto -->
+            <div class="card">
+                <h2>📝 Listar Produto</h2>
+                <div id="listProductMessages"></div>
+                <form onsubmit="listProduct(event)">
+                    <div class="form-group">
+                        <label for="productName">Nome do Produto</label>
+                        <input 
+                            type="text" 
+                            id="productName" 
+                            placeholder="Ex: iPhone 14" 
+                            required
+                            disabled
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label for="productDesc">Descrição</label>
+                        <textarea 
+                            id="productDesc" 
+                            placeholder="Descreva o produto..." 
+                            required
+                            disabled
+                        ></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="productPrice">Preço (USDC)</label>
+                        <input 
+                            type="number" 
+                            id="productPrice" 
+                            placeholder="10.50" 
+                            step="0.01"
+                            min="0.01"
+                            required
+                            disabled
+                        >
+                    </div>
+                    <button type="submit" id="listBtn" disabled>
+                        Listar Produto
+                    </button>
+                </form>
+            </div>
+
+            <!-- Seção: Meu Saldo -->
+            <div class="card">
+                <h2>💰 Meus Ganhos</h2>
+                <div class="balance-info">
+                    <div class="balance-label">Saldo em USDC</div>
+                    <div class="balance-amount" id="sellerBalance">0.00</div>
+                </div>
+                <button onclick="withdrawBalance()" id="withdrawBtn" disabled style="width: 100%;">
+                    Sacar Saldo
+                </button>
+                <div id="withdrawMessages" style="margin-top: 15px;"></div>
+            </div>
+
+            <!-- Seção: Produtos Disponíveis -->
+            <div class="card products-section">
+                <h2>🛒 Produtos Disponíveis</h2>
+                <div id="productsContainer" class="products-grid">
+                    <div class="no-products">Nenhum produto listado ainda</div>
+                </div>
+            </div>
+
+            <!-- Seção: Histórico de Transações -->
+            <div class="card products-section">
+                <h2>📊 Histórico de Transações</h2>
+                <div id="transactionsContainer">
+                    <div style="text-align: center; color: #64748b; padding: 20px;">
+                        Nenhuma transação realizada
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Web3.js (usar versão específica para compatibilidade) -->
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+
+    <!-- Arquivo ABI do contrato -->
+    <script>
+        // ⚠️ ATUALIZE ISSO COM O ENDEREÇO DO SEU CONTRATO APÓS O DEPLOY
+        const CONTRACT_ADDRESS = "0xa87f18cc716Ca98AB9b65eAb4836d181dcd02846";
+        
+        // Endereço do USDC na Arc testnet
+        const USDC_ADDRESS = "0x3600000000000000000000000000000000000000";
+
+        // RPC da Arc testnet
+        const RPC_URL = "https://rpc.testnet.arc.network";
+
+        // ABI do contrato SimpleMarketplace
+        const MARKETPLACE_ABI = [
+            {
+                "inputs": [{"internalType": "address", "name": "_usdc", "type": "address"}],
+                "stateMutability": "nonpayable",
+                "type": "constructor"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "uint256", "name": "productId", "type": "uint256"},
+                    {"indexed": true, "internalType": "address", "name": "seller", "type": "address"},
+                    {"indexed": false, "internalType": "string", "name": "name", "type": "string"},
+                    {"indexed": false, "internalType": "uint256", "name": "price", "type": "uint256"}
+                ],
+                "name": "ProductListed",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "uint256", "name": "transactionId", "type": "uint256"},
+                    {"indexed": true, "internalType": "uint256", "name": "productId", "type": "uint256"},
+                    {"indexed": true, "internalType": "address", "name": "buyer", "type": "address"},
+                    {"indexed": false, "internalType": "address", "name": "seller", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+                ],
+                "name": "ProductPurchased",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [{"indexed": true, "internalType": "uint256", "name": "productId", "type": "uint256"}],
+                "name": "ProductRemoved",
+                "type": "event"
+            },
+            {
+                "anonymous": false,
+                "inputs": [
+                    {"indexed": true, "internalType": "address", "name": "seller", "type": "address"},
+                    {"indexed": false, "internalType": "uint256", "name": "amount", "type": "uint256"}
+                ],
+                "name": "BalanceWithdrawn",
+                "type": "event"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "_productId", "type": "uint256"}],
+                "name": "buyProduct",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [
+                    {"internalType": "string", "name": "_name", "type": "string"},
+                    {"internalType": "string", "name": "_description", "type": "string"},
+                    {"internalType": "uint256", "name": "_price", "type": "uint256"}
+                ],
+                "name": "listProduct",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "_productId", "type": "uint256"}],
+                "name": "removeProduct",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "withdrawBalance",
+                "outputs": [],
+                "stateMutability": "nonpayable",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "_productId", "type": "uint256"}],
+                "name": "getProduct",
+                "outputs": [
+                    {"components": [
+                        {"internalType": "uint256", "name": "id", "type": "uint256"},
+                        {"internalType": "address", "name": "seller", "type": "address"},
+                        {"internalType": "string", "name": "name", "type": "string"},
+                        {"internalType": "string", "name": "description", "type": "string"},
+                        {"internalType": "uint256", "name": "price", "type": "uint256"},
+                        {"internalType": "bool", "name": "available", "type": "bool"},
+                        {"internalType": "uint256", "name": "timeCreated", "type": "uint256"}
+                    ], "internalType": "struct SimpleMarketplace.Product", "name": "", "type": "tuple"}
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "uint256", "name": "_transactionId", "type": "uint256"}],
+                "name": "getTransaction",
+                "outputs": [
+                    {"components": [
+                        {"internalType": "uint256", "name": "id", "type": "uint256"},
+                        {"internalType": "uint256", "name": "productId", "type": "uint256"},
+                        {"internalType": "address", "name": "buyer", "type": "address"},
+                        {"internalType": "address", "name": "seller", "type": "address"},
+                        {"internalType": "uint256", "name": "amount", "type": "uint256"},
+                        {"internalType": "uint256", "name": "timestamp", "type": "uint256"}
+                    ], "internalType": "struct SimpleMarketplace.Transaction", "name": "", "type": "tuple"}
+                ],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [{"internalType": "address", "name": "_seller", "type": "address"}],
+                "name": "getSellerBalance",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getProductCount",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            },
+            {
+                "inputs": [],
+                "name": "getTransactionCount",
+                "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+                "stateMutability": "view",
+                "type": "function"
+            }
+        ];
+
+        // ABI do USDC (ERC20)
+        const USDC_ABI = [
+            {
+                "constant": true,
+                "inputs": [{"name": "_owner", "type": "address"}],
+                "name": "balanceOf",
+                "outputs": [{"name": "balance", "type": "uint256"}],
+                "type": "function"
+            },
+            {
+                "constant": false,
+                "inputs": [
+                    {"name": "_spender", "type": "address"},
+                    {"name": "_value", "type": "uint256"}
+                ],
+                "name": "approve",
+                "outputs": [{"name": "", "type": "bool"}],
+                "type": "function"
+            },
+            {
+                "constant": true,
+                "inputs": [
+                    {"name": "_owner", "type": "address"},
+                    {"name": "_spender", "type": "address"}
+                ],
+                "name": "allowance",
+                "outputs": [{"name": "", "type": "uint256"}],
+                "type": "function"
+            }
+        ];
+
+        let web3;
+        let marketplaceContract;
+        let usdcContract;
+        let userAccount;
+        let isConnected = false;
+
+        // Inicializa Web3
+        async function initWeb3() {
+            try {
+                if (window.ethereum) {
+                    web3 = new Web3(window.ethereum);
+                } else {
+                    web3 = new Web3(new Web3.providers.HttpProvider(RPC_URL));
+                }
+
+                marketplaceContract = new web3.eth.Contract(MARKETPLACE_ABI, CONTRACT_ADDRESS);
+                usdcContract = new web3.eth.Contract(USDC_ABI, USDC_ADDRESS);
+
+                console.log("✅ Web3 inicializado");
+                checkWalletConnection();
+            } catch (error) {
+                console.error("❌ Erro ao inicializar Web3:", error);
+                showMessage("walletSection", "Erro ao inicializar Web3", "error");
+            }
+        }
+
+        // Conecta a carteira
+        async function connectWallet() {
+            try {
+                if (!window.ethereum) {
+                    showMessage("walletSection", "MetaMask não detectada. Instale uma carteira!", "error");
+                    return;
+                }
+
+                const accounts = await window.ethereum.request({ 
+                    method: 'eth_requestAccounts' 
+                });
+
+                if (accounts.length > 0) {
+                    userAccount = accounts[0];
+                    isConnected = true;
+                    
+                    // Muda para Arc testnet
+                    await switchToArcNetwork();
+                    
+                    updateUI();
+                    loadProducts();
+                    loadTransactions();
+                }
+            } catch (error) {
+                console.error("❌ Erro ao conectar:", error);
+                showMessage("walletSection", "Erro ao conectar carteira", "error");
+            }
+        }
+
+        // Muda para a rede Arc testnet
+        async function switchToArcNetwork() {
+            try {
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x4cef52' }], // 5042002 em hex
+                });
+            } catch (error) {
+                if (error.code === 4902) {
+                    // Rede não existe, adiciona
+                    try {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: '0x4cef52',
+                                chainName: 'Arc Testnet',
+                                rpcUrls: ['https://rpc.testnet.arc.network'],
+                                nativeCurrency: {
+                                    name: 'USDC',
+                                    symbol: 'USDC',
+                                    decimals: 18
+                                },
+                                blockExplorerUrls: ['https://testnet.arcscan.app']
+                            }]
+                        });
+                    } catch (addError) {
+                        console.error("Erro ao adicionar rede:", addError);
+                    }
+                }
+            }
+        }
+
+        // Verifica a conexão da carteira
+        async function checkWalletConnection() {
+            try {
+                if (window.ethereum) {
+                    const accounts = await window.ethereum.request({ 
+                        method: 'eth_accounts' 
+                    });
+                    
+                    if (accounts.length > 0) {
+                        userAccount = accounts[0];
+                        isConnected = true;
+                        updateUI();
+                        loadProducts();
+                        loadTransactions();
+                    }
+                }
+            } catch (error) {
+                console.error("Erro ao verificar conexão:", error);
+            }
+        }
+
+        // Atualiza a interface baseado na conexão
+        function updateUI() {
+            const connectBtn = document.getElementById('connectBtn');
+            const status = document.getElementById('connectionStatus');
+            const address = document.getElementById('walletAddress');
+
+            if (isConnected && userAccount) {
+                connectBtn.textContent = 'Conectado ✓';
+                connectBtn.disabled = true;
+                status.textContent = 'Conectado';
+                address.textContent = userAccount.substring(0, 6) + '...' + userAccount.substring(38);
+
+                // Habilita formulários
+                document.getElementById('productName').disabled = false;
+                document.getElementById('productDesc').disabled = false;
+                document.getElementById('productPrice').disabled = false;
+                document.getElementById('listBtn').disabled = false;
+                document.getElementById('withdrawBtn').disabled = false;
+
+                // Atualiza saldo
+                updateSellerBalance();
+            } else {
+                connectBtn.textContent = 'Conectar Carteira';
+                connectBtn.disabled = false;
+                status.textContent = 'Desconectado';
+                address.textContent = 'Clique acima para conectar';
+
+                // Desabilita formulários
+                document.getElementById('productName').disabled = true;
+                document.getElementById('productDesc').disabled = true;
+                document.getElementById('productPrice').disabled = true;
+                document.getElementById('listBtn').disabled = true;
+                document.getElementById('withdrawBtn').disabled = true;
+            }
+        }
+
+        // Lista um novo produto
+        async function listProduct(event) {
+            event.preventDefault();
+
+            if (!isConnected) {
+                showMessage('listProductMessages', 'Conecte sua carteira primeiro', 'error');
+                return;
+            }
+
+            const name = document.getElementById('productName').value;
+            const description = document.getElementById('productDesc').value;
+            const price = document.getElementById('productPrice').value;
+
+            if (!name || !description || !price) {
+                showMessage('listProductMessages', 'Preencha todos os campos', 'error');
+                return;
+            }
+
+            try {
+                const priceInWei = web3.utils.toWei(price.toString(), 'mwei'); // USDC = 6 decimais
+
+                document.getElementById('listBtn').disabled = true;
+                document.getElementById('listBtn').innerHTML = '<span class="loading"></span> Processando...';
+
+                const tx = await marketplaceContract.methods.listProduct(name, description, priceInWei)
+                    .send({ from: userAccount });
+
+                showMessage('listProductMessages', `✅ Produto listado com sucesso!`, 'success');
+                
+                // Limpa o formulário
+                document.getElementById('productName').value = '';
+                document.getElementById('productDesc').value = '';
+                document.getElementById('productPrice').value = '';
+
+                // Recarrega produtos
+                setTimeout(() => {
+                    loadProducts();
+                    document.getElementById('listBtn').disabled = false;
+                    document.getElementById('listBtn').innerHTML = 'Listar Produto';
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erro:", error);
+                showMessage('listProductMessages', `❌ Erro: ${error.message}`, 'error');
+                document.getElementById('listBtn').disabled = false;
+                document.getElementById('listBtn').innerHTML = 'Listar Produto';
+            }
+        }
+
+        // Carrega todos os produtos
+        async function loadProducts() {
+            try {
+                const productCount = await marketplaceContract.methods.getProductCount().call();
+                const container = document.getElementById('productsContainer');
+                
+                if (productCount == 0) {
+                    container.innerHTML = '<div class="no-products">Nenhum produto listado ainda</div>';
+                    return;
+                }
+
+                let productsHTML = '';
+
+                for (let i = 0; i < productCount; i++) {
+                    const product = await marketplaceContract.methods.getProduct(i).call();
+                    const priceInUSDC = web3.utils.fromWei(product.price, 'mwei'); // USDC = 6 decimais
+                    const isOwner = userAccount && product.seller.toLowerCase() === userAccount.toLowerCase();
+
+                    const statusClass = product.available ? 'status-available' : 'status-sold';
+                    const statusText = product.available ? '✓ Disponível' : '✗ Vendido';
+
+                    productsHTML += `
+                        <div class="product-card">
+                            <h3>${product.name}</h3>
+                            <p>${product.description}</p>
+                            <div class="product-price">${parseFloat(priceInUSDC).toFixed(2)} USDC</div>
+                            <div class="product-status ${statusClass}">${statusText}</div>
+                            <div style="color: #64748b; font-size: 0.85em; margin-bottom: 15px;">
+                                ${isOwner ? '👨‍💼 Seu produto' : ''}
+                            </div>
+                            <div class="product-actions">
+                                ${product.available && !isOwner ? 
+                                    `<button onclick="buyProduct(${i})">Comprar</button>` :
+                                    ''}
+                                ${isOwner && product.available ? 
+                                    `<button onclick="removeProduct(${i})" style="background: #ef4444;">Remover</button>` :
+                                    ''}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = productsHTML;
+
+            } catch (error) {
+                console.error("Erro ao carregar produtos:", error);
+            }
+        }
+
+        // Compra um produto
+        async function buyProduct(productId) {
+            if (!isConnected) {
+                showMessage('productsContainer', 'Conecte sua carteira primeiro', 'error');
+                return;
+            }
+
+            try {
+                const product = await marketplaceContract.methods.getProduct(productId).call();
+                
+                // Verifica e aprova USDC se necessário
+                const allowance = await usdcContract.methods.allowance(userAccount, CONTRACT_ADDRESS).call();
+                
+                if (allowance < product.price) {
+                    alert('Aprovando USDC...');
+                    await usdcContract.methods.approve(CONTRACT_ADDRESS, web3.utils.toWei('1000000', 'mwei'))
+                        .send({ from: userAccount });
+                }
+
+                // Executa a compra
+                await marketplaceContract.methods.buyProduct(productId)
+                    .send({ from: userAccount });
+
+                showMessage('productsContainer', '✅ Produto comprado com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    loadProducts();
+                    loadTransactions();
+                    updateSellerBalance();
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erro:", error);
+                showMessage('productsContainer', `❌ Erro na compra: ${error.message}`, 'error');
+            }
+        }
+
+        // Remove um produto
+        async function removeProduct(productId) {
+            if (!confirm('Tem certeza que deseja remover este produto?')) return;
+
+            try {
+                await marketplaceContract.methods.removeProduct(productId)
+                    .send({ from: userAccount });
+
+                showMessage('productsContainer', '✅ Produto removido com sucesso!', 'success');
+                setTimeout(() => loadProducts(), 1500);
+
+            } catch (error) {
+                console.error("Erro:", error);
+                showMessage('productsContainer', `❌ Erro: ${error.message}`, 'error');
+            }
+        }
+
+        // Carrega o histórico de transações
+        async function loadTransactions() {
+            try {
+                const transactionCount = await marketplaceContract.methods.getTransactionCount().call();
+                const container = document.getElementById('transactionsContainer');
+
+                if (transactionCount == 0) {
+                    container.innerHTML = '<div style="text-align: center; color: #64748b; padding: 20px;">Nenhuma transação realizada</div>';
+                    return;
+                }
+
+                let transactionsHTML = '';
+
+                for (let i = transactionCount - 1; i >= 0; i--) {
+                    const tx = await marketplaceContract.methods.getTransaction(i).call();
+                    const product = await marketplaceContract.methods.getProduct(tx.productId).call();
+                    const amountInUSDC = web3.utils.fromWei(tx.amount, 'mwei'); // USDC = 6 decimais
+                    const date = new Date(parseInt(tx.timestamp) * 1000).toLocaleDateString('pt-BR');
+
+                    const isBuyer = userAccount && tx.buyer.toLowerCase() === userAccount.toLowerCase();
+                    const isSeller = userAccount && tx.seller.toLowerCase() === userAccount.toLowerCase();
+
+                    let role = '';
+                    if (isBuyer) role = '👤 Você (comprador)';
+                    else if (isSeller) role = '💰 Você (vendedor)';
+
+                    transactionsHTML += `
+                        <div class="transaction-item">
+                            <div class="transaction-header">
+                                <div>
+                                    <strong>${product.name}</strong>
+                                    <div style="color: #94a3b8; font-size: 0.9em;">${role}</div>
+                                </div>
+                                <div class="transaction-amount">${parseFloat(amountInUSDC).toFixed(2)} USDC</div>
+                            </div>
+                            <div class="transaction-time">${date}</div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = transactionsHTML;
+
+            } catch (error) {
+                console.error("Erro ao carregar transações:", error);
+            }
+        }
+
+        // Atualiza o saldo do vendedor
+        async function updateSellerBalance() {
+            if (!userAccount) return;
+
+            try {
+                const balance = await marketplaceContract.methods.getSellerBalance(userAccount).call();
+                const balanceInUSDC = web3.utils.fromWei(balance, 'mwei'); // USDC = 6 decimais
+                document.getElementById('sellerBalance').textContent = parseFloat(balanceInUSDC).toFixed(2);
+            } catch (error) {
+                console.error("Erro ao obter saldo:", error);
+            }
+        }
+
+        // Saca o saldo
+        async function withdrawBalance() {
+            if (!isConnected) {
+                showMessage('withdrawMessages', 'Conecte sua carteira primeiro', 'error');
+                return;
+            }
+
+            try {
+                const btn = document.getElementById('withdrawBtn');
+                btn.disabled = true;
+                btn.innerHTML = '<span class="loading"></span> Processando...';
+
+                await marketplaceContract.methods.withdrawBalance()
+                    .send({ from: userAccount });
+
+                showMessage('withdrawMessages', '✅ Saldo sacado com sucesso!', 'success');
+                
+                setTimeout(() => {
+                    updateSellerBalance();
+                    btn.disabled = false;
+                    btn.innerHTML = 'Sacar Saldo';
+                }, 2000);
+
+            } catch (error) {
+                console.error("Erro:", error);
+                showMessage('withdrawMessages', `❌ Erro: ${error.message}`, 'error');
+                const btn = document.getElementById('withdrawBtn');
+                btn.disabled = false;
+                btn.innerHTML = 'Sacar Saldo';
+            }
+        }
+
+        // Função auxiliar para mostrar mensagens
+        function showMessage(containerId, message, type) {
+            const container = document.getElementById(containerId);
+            const messageClass = type === 'error' ? 'error-message' : 'success-message';
+            const msgDiv = document.createElement('div');
+            msgDiv.className = messageClass;
+            msgDiv.textContent = message;
+            msgDiv.style.marginBottom = '10px';
+
+            container.insertAdjacentElement('afterbegin', msgDiv);
+
+            setTimeout(() => msgDiv.remove(), 5000);
+        }
+
+        // Event listeners para mudanças de carteira
+        if (window.ethereum) {
+            window.ethereum.on('accountsChanged', () => {
+                location.reload();
+            });
+
+            window.ethereum.on('chainChanged', () => {
+                location.reload();
+            });
+        }
+
+        // Inicializa quando o documento carrega
+        document.addEventListener('DOMContentLoaded', initWeb3);
+    </script>
+</body>
+</html>

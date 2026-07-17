@@ -23,6 +23,8 @@
         #splash { position: fixed; inset: 0; z-index: 100000; background: #06080D; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.8s ease; }
         #splash.hide { opacity: 0; pointer-events: none; }
         #splashCanvas { display: block; }
+        #splash .splash-img { width: 300px; max-width: 80vw; border-radius: 20px; box-shadow: 0 20px 60px rgba(39,117,202,0.35); opacity: 0; transform: scale(0.92); animation: splashImgIn 1.2s cubic-bezier(0.23,1,0.32,1) 0.2s forwards; }
+        @keyframes splashImgIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
         #splash .splash-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.7rem; font-weight: 600; margin-top: 18px; opacity: 0; animation: fadeUp 1s ease 1.8s forwards; background: linear-gradient(120deg, #fff, var(--usdc-light)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
         #splash .splash-sub { font-size: 0.85rem; color: var(--muted); margin-top: 4px; letter-spacing: 0.15em; text-transform: uppercase; opacity: 0; animation: fadeUp 1s ease 2.2s forwards; }
         @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -162,7 +164,7 @@
 <body>
 
     <div id="splash">
-        <canvas id="splashCanvas" width="360" height="360"></canvas>
+        <img src="nft/arc-bone.jpeg" alt="Arc" class="splash-img">
         <div class="splash-name">Simple Marketplace</div>
         <div class="splash-sub">on Arc Testnet</div>
     </div>
@@ -268,92 +270,12 @@
         }
 
         (function splash() {
-            const canvas = document.getElementById('splashCanvas');
-            const ctx = canvas.getContext('2d');
-            const W = 360, H = 360, dpr = window.devicePixelRatio || 1;
-            canvas.width = W*dpr; canvas.height = H*dpr; canvas.style.width = W+'px'; canvas.style.height = H+'px'; ctx.scale(dpr,dpr);
-
-            // ─── Pontos que formam o "A" da Arc (baseado no logo das canecas) ───
-            // O "A" da Arc: arco superior curvo (domo) + perna esquerda diagonal + perna direita vertical com gancho na base
-            const targets = [];
-            const cx = W/2, cy = H/2;
-            const scale = 1.15;
-
-            // Arco superior (domo largo) — bem denso para ficar nítido
-            for (let a = Math.PI*0.05; a <= Math.PI*0.95; a += 0.035) {
-                const r = 88 * scale;
-                targets.push({ x: cx - Math.cos(a)*r*0.82, y: cy - Math.sin(a)*r*0.72 - 30 });
-            }
-            // Perna esquerda — desce em diagonal do topo do arco até a base
-            for (let i = 0; i <= 26; i++) {
-                const tt = i/26;
-                targets.push({ x: cx - 72*scale + tt*26*scale, y: cy - 88*scale + tt*180*scale });
-            }
-            // Perna direita — vertical reta (característica do A da Arc)
-            for (let i = 0; i <= 26; i++) {
-                const tt = i/26;
-                targets.push({ x: cx + 46*scale, y: cy - 92*scale + tt*184*scale });
-            }
-            // Gancho inferior direito (a "curva" que fecha o A da Arc)
-            for (let a = 0; a <= Math.PI*0.55; a += 0.09) {
-                targets.push({ x: cx + 46*scale - Math.sin(a)*32*scale, y: cy + 84*scale + Math.cos(a)*5 });
-            }
-
-            const particles = targets.map(tg => ({
-                x: cx + (Math.random()-0.5)*W*1.1,
-                y: cy + (Math.random()-0.5)*H*1.1,
-                tx: tg.x, ty: tg.y, vx: 0, vy: 0,
-                delay: Math.random()*20
-            }));
-
-            let frame = 0, raf;
-            function draw() {
-                ctx.clearRect(0,0,W,H); frame++;
-                const settle = Math.min(frame/75, 1);
-
-                // Linhas de conexão (rede) — desenhadas primeiro, atrás dos pontos
-                if (settle > 0.35) {
-                    for (let i = 0; i < particles.length; i++) {
-                        for (let j = i+1; j < particles.length; j++) {
-                            const d = Math.hypot(particles[i].x-particles[j].x, particles[i].y-particles[j].y);
-                            if (d < 24) {
-                                ctx.beginPath();
-                                ctx.moveTo(particles[i].x, particles[i].y);
-                                ctx.lineTo(particles[j].x, particles[j].y);
-                                ctx.strokeStyle = `rgba(74,159,232,${0.28*(1-d/24)*settle})`;
-                                ctx.lineWidth = 0.8;
-                                ctx.stroke();
-                            }
-                        }
-                    }
-                }
-
-                // Pontos com glow (símbolo nítido)
-                particles.forEach(p => {
-                    const active = frame > p.delay;
-                    if (active) {
-                        const dx = p.tx-p.x, dy = p.ty-p.y;
-                        p.vx += dx*0.025; p.vy += dy*0.025; p.vx *= 0.86; p.vy *= 0.86; p.x += p.vx; p.y += p.vy;
-                    }
-                    const alpha = 0.6 + settle*0.4;
-                    // halo/glow
-                    ctx.shadowColor = 'rgba(74,159,232,0.9)';
-                    ctx.shadowBlur = 8 * settle;
-                    ctx.beginPath();
-                    ctx.arc(p.x, p.y, 2.8, 0, Math.PI*2);
-                    ctx.fillStyle = `rgba(120,190,255,${alpha})`;
-                    ctx.fill();
-                });
-                ctx.shadowBlur = 0;
-
-                if (frame < 280) raf = requestAnimationFrame(draw);
-            }
-            draw();
-
-            // 4 segundos de duração, depois fade de 0.8s
+            // Tela de abertura com a imagem do boné da Arc — 4 segundos, depois fade
             setTimeout(() => {
-                document.getElementById('splash').classList.add('hide');
-                setTimeout(() => { cancelAnimationFrame(raf); const s = document.getElementById('splash'); if(s) s.style.display = 'none'; }, 800);
+                const s = document.getElementById('splash');
+                if (!s) return;
+                s.classList.add('hide');
+                setTimeout(() => { s.style.display = 'none'; }, 800);
             }, 4000);
         })();
 
